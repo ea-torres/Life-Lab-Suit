@@ -15,7 +15,7 @@ const SCENE={heading:15,sun:40,rocks:70,
 
 // ---- FATIGA: se calcula a partir de 4 lecturas del parche ----
 // [nombre, unidad, sensor, rango normal]
-const LABELS={glu:["Glucose","mg/dL","patch","80–110"],lac:["Lactate","mmol/L","patch","0.5–2"],temp:["Temperature","°C","patch","36.5–37.5"],hyd:["Hydration","%","patch","80–100"]};
+const LABELS={glu:["Glucose","mg/dL","patch","80–110"],lac:["Lactate","mmol/L","patch","0.5–2"],temp:[" H₂O₂","","patch","100-120"],hyd:["","","",""]};
 // ok: valor sin estrés; bad: valor con estrés máximo; w: peso en el índice (suman 1)
 // (la glucosa baja y el lactato, la temperatura y la deshidratación altos aumentan la fatiga)
 const FAT={glu:{ok:90,bad:55,w:.25},lac:{ok:2,bad:8,w:.3},temp:{ok:37,bad:39,w:.2},hyd:{ok:85,bad:55,w:.25}};
