@@ -69,12 +69,32 @@ function fat(v){
   const idx=Math.round(100*(.5*mx+.5*ws/sw)),L=LEVELS.find(l=>idx<l[0]);
   return {idx,name:L[1],cls:L[2],st,drv:mx>0?drv:""};
 }
-function render(){
-  const F=fat(sc.v),al=$("al"),title=sc.calc?F.name+" fatigue":sc.title,cls=sc.calc?F.cls:sc.lvl;
-  al.className="pl ai "+(gs>=0?"crit":cls);
-  $("vit").innerHTML=`<small style="color:#8fd3c9">Fatigue · from 4 readings</small><div class="fi"><b>${F.idx}</b> /100 · ${F.name}</div><div class="fb"><i style="left:${F.idx}%"></i></div>`
-    +Object.keys(LABELS).map(k=>{const l=LABELS[k],x=F.st[k];return `<div class="fr ${x>=.7?"c":x>=.3?"w":""}"><span>${l[0]}</span><b>${sc.v[k]} <small>${l[1]}</small></b></div>`}).join("")
+// ---- H₂O₂: lecturas simuladas y alerta ----
+let h2Alert=false,h2Last=[],h2Streak=0,h2Show=null;
+function drawVit(){
+  const F=fat(sc.v);
+  $("vit").innerHTML=`<small style="color:#8fd3c9">Fatigue · from 3 readings</small><div class="fi"><b>${F.idx}</b> /100 · ${F.name}</div><div class="fb"><i style="left:${F.idx}%"></i></div>`
+    +Object.keys(LABELS).map(k=>{const l=LABELS[k],x=F.st[k],hot=k==="h2o2"&&h2Alert,v=k==="h2o2"&&h2Show!==null?h2Show:sc.v[k];
+      return `<div class="fr ${hot||x>=.7?"c":x>=.3?"w":""}"><span>${l[0]}</span><b>${v} <small>${l[1]}</small></b></div>`}).join("")
+    +`<div class="h2t ${h2Alert?"c":""}">${h2Alert?"H₂O₂: unusual activity alert":"H₂O₂: "+h2Streak+" of "+H2.need+" valid readings above "+H2.alert}</div>`
     +`<small style="color:#8fd3c9">${F.drv?"Main driver: "+LABELS[F.drv][0]:"All readings in range"}</small>`;
+}
+function h2Tick(){
+  const bad=Math.random()<H2.invalid,val=Math.round(sc.v.h2o2+(Math.random()*2-1)*H2.noise);
+  if(!bad){h2Show=val;h2Last.push(val);if(h2Last.length>H2.need)h2Last.shift()}
+  let n=0;for(let i=h2Last.length-1;i>=0&&h2Last[i]>H2.alert;i--)n++;
+  h2Streak=n;
+  const al=n>=H2.need;
+  if(al!==h2Alert){h2Alert=al;if(sc.h2&&gs<0){render();return}}
+  drawVit();
+}
+setInterval(h2Tick,H2.tick);
+
+function render(){
+  const F=fat(sc.v),al=$("al"),hot=sc.h2&&h2Alert,
+    title=hot?sc.title2:(sc.calc?F.name+" fatigue":sc.title),msg=hot?sc.msg2:sc.msg,cls=hot?"warn":(sc.calc?F.cls:sc.lvl);
+  al.className="pl ai "+(gs>=0?"crit":cls);
+  drawVit();
   $("holo").classList.toggle("on",gs>=0);
   $("doctxt").innerHTML=(sc.doc||"Flight surgeon")+" · Mission Control<br><span style='color:#8fd3c9'>Live hologram, simulated 12 min delay. HoloConnect AI already sent your sensor summary.</span>";
   if(gs>=0){
@@ -82,7 +102,7 @@ function render(){
     al.innerHTML=`<h3>Step ${gs+1} of ${G.steps.length} · ${q[0]}</h3><p>${q[1]}</p><div class="acts"><button id="nx">${gs===G.steps.length-1?"Finish guide":"Next step"}</button></div>`;
     $("nx").onclick=nx;renderProt();return;
   }
-  al.innerHTML=`<h3>${title}</h3><p>${sc.msg}</p><div class="acts"></div>${sc.acts.length?"<small id='auto'></small>":""}`;
+  al.innerHTML=`<h3>${title}</h3><p>${msg}</p><div class="acts"></div>${sc.acts.length?"<small id='auto'></small>":""}`;
   const box=al.querySelector(".acts");
   sc.acts.forEach(a=>{const b=document.createElement("button");b.textContent=a[0];b.onclick=()=>{if(a[1]==="guide"){gs=0;render()}else $("doc").classList.toggle("on")};box.appendChild(b)});
   renderProt();
@@ -94,7 +114,7 @@ function nx(){
   sc={...SCEN.nominal,calc:false,title:G.doneTitle,msg:G.doneMsg};kick();render();upd();
 }
 function pick(k){
-  key=k;sc=SCEN[k];gs=-1;done=false;$("doc").classList.remove("on");
+  key=k;sc=SCEN[k];gs=-1;done=false;h2Alert=false;h2Last=[];h2Streak=0;h2Show=null;$("doc").classList.remove("on");
   tdl=sc.dust||0;tsp=k==="dust"?.9:0;setProt();render();upd();kick();
 }
 document.querySelectorAll(".sc button").forEach(b=>b.onclick=()=>{
