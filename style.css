@@ -33,11 +33,6 @@ header p{margin:4px 0 0;color:var(--mu)}
 .bar i{display:block;height:6px;border-radius:3px;background:rgba(95,227,208,.2);margin-top:3px;overflow:hidden}
 .bar i span{display:block;height:100%;background:#5fe3d0;transition:width .3s}
 .ai{left:clamp(14px,6vw,90px);transform:none;top:290px;bottom:auto;width:min(280px,56%);font:400 14px/1.45 "IBM Plex Sans",sans-serif;padding:12px 14px}
-.ai.warn{border-color:#ffb347;background:rgba(40,26,6,.7)}
-.ai.crit{border-color:#ff5a5a;background:rgba(40,8,8,.72)}
-.ai h3{font-size:17px;margin-bottom:3px;color:#e9fff9}
-.ai p{margin:0 0 8px}
-.ai small{color:#8fd3c9;font-size:12px}
 .acts{display:flex;flex-wrap:wrap;gap:8px}
 .acts button{background:#0b2b31;color:#bff5ec;border-color:#2f8f84;font-size:13px;padding:6px 10px}
 .acts button.inj{border-color:#ffb347}
