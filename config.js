@@ -15,10 +15,13 @@ const SCENE={heading:15,sun:40,rocks:70,
 
 // ---- FATIGA: se calcula a partir de 4 lecturas del parche ----
 // [nombre, unidad, sensor, rango normal]
-const LABELS={glu:["Glucose","mg/dL","patch","80–110"],lac:["Lactate","mmol/L","patch","0.5–2"],temp:[" H₂O₂","","patch","100-120"],hyd:["","","",""]};
+const LABELS={glu:["Glucose","mg/dL","patch","80–110"],lac:["Lactate","mmol/L","patch","0.5–2"],h2o2:["H₂O₂ index","idx","patch","≈120 in activity"]};
 // ok: valor sin estrés; bad: valor con estrés máximo; w: peso en el índice (suman 1)
-// (la glucosa baja y el lactato, la temperatura y la deshidratación altos aumentan la fatiga)
-const FAT={glu:{ok:90,bad:55,w:.25},lac:{ok:2,bad:8,w:.3},temp:{ok:37,bad:39,w:.2},hyd:{ok:85,bad:55,w:.25}};
+const FAT={glu:{ok:90,bad:55,w:.35},lac:{ok:2,bad:8,w:.4},h2o2:{ok:120,bad:180,w:.25}};
+// H₂O₂: ÍNDICE EXPERIMENTAL de la simulación (no es una concentración ni un diagnóstico de daño).
+// usual: señal habitual en actividad; alert: umbral; need: lecturas VÁLIDAS consecutivas por encima del umbral
+// noise: variación aleatoria de cada lectura; invalid: probabilidad de lectura inválida (se ignora); tick: ms entre lecturas
+const H2={usual:120,alert:150,need:2,noise:4,invalid:.15,tick:1500};
 // Niveles del índice 0-100: [hasta, nombre, color de alerta]
 const LEVELS=[[25,"Low",""],[50,"Moderate","warn"],[75,"High","warn"],[101,"Severe","crit"]];
 
@@ -33,11 +36,12 @@ const PROT=[["Visor dust shield","dust","shield"],["Joint covers","dust",""],["S
 // ---- ESCENARIOS ----
 // v: lecturas; calc: el título y color salen del índice de fatiga; dust: nivel de polvo 0-1
 // acts: botones [texto, tipo] con tipo guide (guía holográfica) o doc (llamar a Tierra)
-const NOM={glu:92,lac:1.4,temp:36.9,hyd:88};
+const NOM={glu:92,lac:1.4,h2o2:120};
 const SCEN={
-nominal:{calc:true,lvl:"",v:{...NOM},dust:0,title:"Rested",msg:"All four readings are in range. Dust protection is on standby.",acts:[]},
-mod:{calc:true,lvl:"",v:{glu:74,lac:3.6,temp:37.6,hyd:72},dust:0,title:"",msg:"Your readings are drifting out of range. Sip water, slow your pace and take a glucose gel.",acts:[["Start recovery guide","guide"],["Call flight surgeon","doc"]],guide:"fatigue",doc:"Flight surgeon"},
-severe:{calc:true,lvl:"",v:{glu:58,lac:6.8,temp:38.4,hyd:58},dust:0,title:"",msg:"Your body is under heavy strain. Stop, cool down and recover before you continue.",acts:[["Start recovery guide","guide"],["Call flight surgeon","doc"]],guide:"fatigue",doc:"Flight surgeon"},
+nominal:{calc:true,lvl:"",v:{...NOM},dust:0,title:"Rested",msg:"All three readings are in range. Dust protection is on standby.",acts:[]},
+mod:{calc:true,lvl:"",v:{glu:74,lac:3.6,h2o2:135},dust:0,title:"",msg:"Your readings are drifting out of range. Sip water, slow your pace and take a glucose gel.",acts:[["Start recovery guide","guide"],["Call flight surgeon","doc"]],guide:"fatigue",doc:"Flight surgeon"},
+severe:{calc:true,lvl:"",v:{glu:58,lac:6.8,h2o2:145},dust:0,title:"",msg:"Your body is under heavy strain. Stop, cool down and recover before you continue.",acts:[["Start recovery guide","guide"],["Call flight surgeon","doc"]],guide:"fatigue",doc:"Flight surgeon"},
+h2o2:{calc:false,h2:true,lvl:"",v:{glu:88,lac:2.2,h2o2:165},dust:0,title:"H₂O₂ index above 150",msg:"HoloConnect AI is waiting for two valid readings in a row before it raises an alert.",title2:"Unusual activity",msg2:"The H₂O₂ index stayed above 150 in two valid readings in a row. This is an experimental simulation index, not a concentration or a diagnosis of damage. Slow down and recheck.",acts:[["Call flight surgeon","doc"]],doc:"Flight surgeon"},
 dust:{calc:false,lvl:"warn",v:{...NOM},dust:1,title:"Heavy dust detected",msg:"A dust front is arriving. HoloConnect AI is protecting the suit automatically. Head back to the airlock.",acts:[["Open decontamination guide","guide"],["Call suit engineer","doc"]],guide:"dust",doc:"Suit engineer"}
 };
 
