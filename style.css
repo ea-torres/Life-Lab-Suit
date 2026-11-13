@@ -32,7 +32,7 @@ header p{margin:4px 0 0;color:var(--mu)}
 .bar{margin-bottom:7px}
 .bar i{display:block;height:6px;border-radius:3px;background:rgba(95,227,208,.2);margin-top:3px;overflow:hidden}
 .bar i span{display:block;height:100%;background:#5fe3d0;transition:width .3s}
-.ai{left:50%;transform:translateX(-50%);bottom:clamp(16px,5vh,44px);width:min(560px,88%);font:400 14px/1.45 "IBM Plex Sans",sans-serif;padding:12px 14px}
+.ai{left:clamp(14px,6vw,90px);transform:none;top:290px;bottom:auto;width:min(280px,56%);font:400 14px/1.45 "IBM Plex Sans",sans-serif;padding:12px 14px}
 .ai.warn{border-color:#ffb347;background:rgba(40,26,6,.7)}
 .ai.crit{border-color:#ff5a5a;background:rgba(40,8,8,.72)}
 .ai h3{font-size:17px;margin-bottom:3px;color:#e9fff9}
